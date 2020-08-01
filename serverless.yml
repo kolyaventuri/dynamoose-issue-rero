@@ -15,6 +15,8 @@ provider:
     ENV: ${self:provider.stage}
     REGION: ${self:provider.region}
     SERVICE_NAME: ${self:service}-${self:provider.stage}
+    DYNAMO_URL: ${self:custom.dynamo.url.${self:provider.stage}, ""}
+    DYNAMO_USERS_TABLE: ${self:custom.dynamo.table.users}
 
 custom:
   logs:
@@ -36,20 +38,32 @@ custom:
   prune:
     automatic: true
     number: 5
-  domain:
-    enabled:
-      production: true
-      dev: false
-      local: false
-  customDomain:
-    domainName: example.com
-    stage: production
-    basePath: ''
-    certificateName: 'example.com'
-    createRoute53Record: true
-    endpointType: 'regional'
-    securityPolicy: tls_1_2
-    enabled: ${self:custom.domain.enabled.${self:provider.stage}}
+  dynamo:
+    url:
+      local: http://localhost:8000
+    table:
+      users: users_${self:provider.stage}
+    capacity:
+      production:
+        read: 5
+        write: 5
+      dev:
+        read: 1
+        write: 3
+      local:
+        read: 5
+        write: 5
+  dynamodb:
+    stages:
+      - local
+    start:
+      port: 8000
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+      seed: true
+      convertEmptyValues: true
 
 functions:
   healthcheck:
@@ -59,7 +73,42 @@ functions:
       - http:
           path: healthcheck
           method: get
-    
+  v1_POST_users:
+    handler: src/routes/v1/users/post.handler
+    description: POST /v1/users route
+    events:
+      - http:
+          path: v1/users
+          method: post
+resources:
+  Resources:
+    UserTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.dynamo.table.users} 
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+          - AttributeName: call_id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: 'callId_index'
+            KeySchema:
+              - AttributeName: call_id
+                KeyType: HASH
+            Projection:
+              NonKeyAttributes:
+                - id
+              ProjectionType: INCLUDE
+            ProvisionedThroughput:
+              ReadCapacityUnits: ${self:custom.dynamo.capacity.${self:provider.stage}.read}
+              WriteCapacityUnits: ${self:custom.dynamo.capacity.${self:provider.stage}.write}
+        ProvisionedThroughput:
+          ReadCapacityUnits: ${self:custom.dynamo.capacity.${self:provider.stage}.read}
+          WriteCapacityUnits: ${self:custom.dynamo.capacity.${self:provider.stage}.write}
 plugins:
   - serverless-webpack
   - serverless-plugin-warmup
@@ -67,3 +116,4 @@ plugins:
   - serverless-prune-plugin
   - serverless-domain-manager
   - serverless-offline
+  - serverless-dynamodb-local

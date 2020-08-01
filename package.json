@@ -8,13 +8,17 @@
     "deploy": "sls deploy --stage dev",
     "deploy:production": "sls deploy --stage production",
     "deploy:stage": "sls deploy --stage stage",
+    "dynamo:start": "sls dynamodb start --stage local",
+    "dynamo:install": "sls dynamodb install",
+    "dynamo:reset": "ts-node ./scripts/reset-db.ts && sls dynamodb migrate --stage local",
     "serve": "sls offline --httpPort 3000 --stage local --noPrependStageInUrl --noAuth",
     "serve:watch": "nodemon -e js,ts,jsx,tsx,yml -x npm run serve",
     "test": "npm-run-all lint:* test:*",
     "test:unit": "cross-env TS_NODE_PROJECT=tsconfig.ava.json ava",
     "lint:tsc": "tsc --noEmit",
     "lint:lint": "xo --fix",
-    "build": "sls webpack"
+    "build": "sls webpack",
+    "postinstall": "npm run dynamo:install"
   },
   "repository": {
     "type": "git",

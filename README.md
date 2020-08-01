@@ -3,6 +3,19 @@ _Template repository for Serverless AWS Lambda apps using the Serverless Framewo
 
 [![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
 ---
+# Issue description
+- Despite using `dynamoose.aws.ddb.local()`, a connection to AWS still appears to be made, causing failures
+
+# Reproing the issue
+- Clone down
+- `npm i` should auto-run setup for dyanmodb-local
+- `npm run serve` to start the server
+- Send a `POST` request to `http://localhost:3000/v1/users` with a JSON payload
+  - Payload shape is simply `{ user: string; }`
+- Should see the request hang, and eventually in console an `ETIMEDOUT` error
+
+
+# Original README follows
 
 # Overview
 Run fast with a new [AWS Lambda](https://aws.amazon.com/lambda/) serverless project using a quick and dirty TypeScript stack!
