@@ -9,12 +9,13 @@ _Template repository for Serverless AWS Lambda apps using the Serverless Framewo
 # Reproing the issue
 - Clone down
 - `npm i` should auto-run setup for dyanmodb-local
+- Run `npm run dynamo:start` in a separate terminal to get local DynamoDB going
 - `npm run serve` to start the server
 - Send a `POST` request to `http://localhost:3000/v1/users` with a JSON payload
   - For simplicity, shape is simply `{ username: string; }`
 - Should see the request hang, and eventually in console an `ETIMEDOUT` error
 
-
+---
 # Original README follows
 
 # Overview
