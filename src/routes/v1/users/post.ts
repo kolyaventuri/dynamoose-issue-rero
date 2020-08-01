@@ -28,11 +28,9 @@ export const userPost: Handler = async (request: AWSLambda.APIGatewayEvent): Pro
   }
 
   try {
-    const {phoneNumber, username, email} = data;
+    const {username} = data;
     const newUser = new User({
-      phoneNumber,
-      username,
-      email
+      username
     });
 
     await newUser.save();
