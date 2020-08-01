@@ -11,7 +11,7 @@ _Template repository for Serverless AWS Lambda apps using the Serverless Framewo
 - `npm i` should auto-run setup for dyanmodb-local
 - `npm run serve` to start the server
 - Send a `POST` request to `http://localhost:3000/v1/users` with a JSON payload
-  - Payload shape is simply `{ user: string; }`
+  - For simplicity, shape is simply `{ username: string; }`
 - Should see the request hang, and eventually in console an `ETIMEDOUT` error
 
 

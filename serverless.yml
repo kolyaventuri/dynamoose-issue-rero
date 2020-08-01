@@ -67,7 +67,7 @@ custom:
 
 functions:
   healthcheck:
-    handler: src/healthcheck/get.handler
+    handler: src/routes/healthcheck/get.handler
     description: Basic page ok healthcheck
     events:
       - http:
